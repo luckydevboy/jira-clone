@@ -4,8 +4,10 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-import { emailSchema, passwordSchema } from "@/lib/schemas";
+import { signUpSchema } from "@/features/auth/schemas";
+import useSignUp from "@/features/auth/api/use-sign-up";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,34 +27,32 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-const formSchema = z
-  .object({
-    firstName: z.string().trim(),
-    lastName: z.string().trim(),
-    email: emailSchema,
-    password: passwordSchema,
-    confirmPassword: passwordSchema,
-  })
-  .refine(
-    (data) => {
-      return data.password === data.confirmPassword;
-    },
-    {
-      message: "Passwords do not match",
-      path: ["confirmPassword"],
-    }
-  );
-
 export default function SignUpForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const router = useRouter();
+  const { mutate, isPending } = useSignUp();
+  const form = useForm<z.infer<typeof signUpSchema>>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
+      firstName: "",
+      lastName: "",
+    },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  function onSubmit(values: z.infer<typeof signUpSchema>) {
+    mutate(
+      { json: values },
+      {
+        onSuccess: () => {
+          router.push("/");
+        },
+      }
+    );
   }
 
   return (
@@ -77,7 +77,7 @@ export default function SignUpForm({
                       <FormItem className="grid gap-3">
                         <FormLabel>First Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="John" {...field} />
+                          <Input type="text" placeholder="John" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -90,7 +90,7 @@ export default function SignUpForm({
                       <FormItem className="grid gap-3">
                         <FormLabel>Last Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="Doe" {...field} />
+                          <Input type="text" placeholder="Doe" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -104,7 +104,11 @@ export default function SignUpForm({
                     <FormItem className="grid gap-3">
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="email@example.com" {...field} />
+                        <Input
+                          placeholder="email@example.com"
+                          type="email"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -117,7 +121,7 @@ export default function SignUpForm({
                     <FormItem className="grid gap-3">
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input type="password" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -130,19 +134,21 @@ export default function SignUpForm({
                     <FormItem className="grid gap-3">
                       <FormLabel>Confirm Password</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input type="password" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
                 <div className="flex flex-col gap-3">
-                  <Button type="submit" className="w-full">
+                  <Button
+                    isLoading={isPending}
+                    disabled={isPending}
+                    type="submit"
+                    className="w-full"
+                  >
                     Sign Up
                   </Button>
-                  {/* <Button variant="outline" className="w-full">
-                  Sign up with Google
-                </Button> */}
                 </div>
               </div>
               <div className="mt-4 text-center text-sm">

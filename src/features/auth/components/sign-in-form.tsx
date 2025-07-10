@@ -4,9 +4,10 @@ import { z } from "zod";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 
 import { cn } from "@/lib/utils";
-import { emailSchema, passwordSchema } from "@/lib/schemas";
+import { signInSchema } from "@/features/auth/schemas";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -24,22 +25,31 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-
-const formSchema = z.object({
-  email: emailSchema,
-  password: passwordSchema,
-});
+import useSignIn from "@/features/auth/api/use-sign-in";
 
 export default function SignInForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const router = useRouter();
+  const { mutate, isPending } = useSignIn();
+  const form = useForm<z.infer<typeof signInSchema>>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  function onSubmit(values: z.infer<typeof signInSchema>) {
+    mutate(
+      { json: values },
+      {
+        onSuccess: () => {
+          router.push("/");
+        },
+      }
+    );
   }
 
   return (
@@ -47,9 +57,9 @@ export default function SignInForm({
       <h1 className="font-black text-center text-3xl">JiraClone</h1>
       <Card>
         <CardHeader>
-          <CardTitle>Login to your account</CardTitle>
+          <CardTitle>Sign in to your account</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account
+            Enter your email below to sign in to your account
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -63,7 +73,11 @@ export default function SignInForm({
                     <FormItem className="grid gap-3">
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="email@example.com" {...field} />
+                        <Input
+                          type="email"
+                          placeholder="email@example.com"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -93,8 +107,13 @@ export default function SignInForm({
                   />
                 </div>
                 <div className="flex flex-col gap-3">
-                  <Button type="submit" className="w-full">
-                    Login
+                  <Button
+                    isLoading={isPending}
+                    disabled={isPending}
+                    type="submit"
+                    className="w-full"
+                  >
+                    Sign In
                   </Button>
                 </div>
               </div>
