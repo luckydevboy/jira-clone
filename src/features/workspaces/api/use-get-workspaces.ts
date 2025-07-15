@@ -2,16 +2,16 @@ import { useQuery } from "@tanstack/react-query";
 
 import { client } from "@/lib/server/rpc";
 
-import { AUTH_QUERY_KEYS } from "./query-keys";
+import { WORKSPACES_QUERY_KEYS } from "./query-keys";
 
-export default function useCurrent() {
+export default function useGetWorkspaces() {
   const query = useQuery({
-    queryKey: [AUTH_QUERY_KEYS.CURRENT_USER],
+    queryKey: [WORKSPACES_QUERY_KEYS.WORKSPACES],
     queryFn: async () => {
-      const response = await client.api.v1.auth.current.$get();
+      const response = await client.api.v1.workspaces.$get();
 
       if (!response.ok) {
-        return null;
+        throw new Error("Failed to fetch workspaces");
       }
 
       const { data } = await response.json();

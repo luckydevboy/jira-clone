@@ -1,11 +1,11 @@
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { InferRequestType, InferResponseType } from "hono";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import { client } from "@/lib/server/rpc";
 
-import { AuthQueryKeys } from "./query-keys.enum";
+import { AUTH_QUERY_KEYS } from "./query-keys";
 
 type ResponseType = InferResponseType<
   (typeof client.api.v1.auth)["sign-up"]["$post"]
@@ -23,12 +23,18 @@ export default function useSignUp() {
         json,
       });
 
+      if (!response.ok) {
+        throw new Error("Failed to sign up");
+      }
+
       return await response.json();
     },
     onSuccess: () => {
       toast.success("Signed up successfully");
       router.refresh();
-      queryClient.invalidateQueries({ queryKey: [AuthQueryKeys.CurrentUser] });
+      queryClient.invalidateQueries({
+        queryKey: [AUTH_QUERY_KEYS.CURRENT_USER],
+      });
     },
     onError: () => {
       toast.error("Failed to sign up");
