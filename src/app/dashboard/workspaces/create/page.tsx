@@ -10,7 +10,7 @@ export default async function CreateWorkspacePage() {
 
   const workspaces = await getWorkspaces();
   if (workspaces.total !== 0) {
-    redirect(`/workspaces/${workspaces.documents[0].$id}`);
+    redirect(`/dashboard/workspaces/${workspaces.documents[0].$id}`);
   }
 
   return <CreateWorkspaceForm />;
