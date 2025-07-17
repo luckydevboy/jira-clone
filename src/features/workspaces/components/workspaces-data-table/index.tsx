@@ -1,8 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-
 import useGetWorkspaces from "../../api/use-get-workspaces";
+import CreateWorkspaceModal from "../create-workspace-modal";
 
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
@@ -16,18 +15,16 @@ export default function WorkspacesDataTable() {
 
   return (
     <>
-      <div className="flex justify-end">
-        <Button variant="secondary" className="mb-4">
-          Create workspace
-        </Button>
-      </div>
+      <CreateWorkspaceModal />
       <DataTable
         columns={columns}
         data={
           data?.documents.map((doc) => ({
             id: doc.$id,
             name: doc.name,
-            members: [],
+            members: doc.members,
+            createdAt: doc.$createdAt,
+            role: doc.role,
           })) ?? []
         }
       />

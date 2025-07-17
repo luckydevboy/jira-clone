@@ -1,8 +1,8 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
-import { ID, Query } from "node-appwrite";
+import { ID, Models, Query } from "node-appwrite";
 
-import { DATABASE_ID, MEMBERS_ID, WORKSPACES_ID } from "@/config";
+import { DATABASE_ID, MEMBERS_ID, PROFILES_ID, WORKSPACES_ID } from "@/config";
 import { MEMBER_ROLE } from "@/features/members/types";
 import { sessionMiddleware } from "@/lib/server/middlewares/session-middleware";
 import { generateInviteCode } from "@/lib/utils";
@@ -14,15 +14,21 @@ const app = new Hono()
     const user = c.get("user");
     const databases = c.get("databases");
 
-    const members = await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
+    const profile = await databases.listDocuments(DATABASE_ID, PROFILES_ID, [
       Query.equal("userId", user.$id),
+    ]);
+
+    const members = await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
+      Query.equal("profile", profile.documents[0].$id),
     ]);
 
     if (members.total === 0) {
       return c.json({ data: { total: 0, documents: [] } });
     }
 
-    const workspaceIds = members.documents.map((member) => member.workspaceId);
+    const workspaceIds = members.documents.map(
+      (member) => member.workspace.$id
+    );
 
     const workspaces = await databases.listDocuments(
       DATABASE_ID,
@@ -30,7 +36,40 @@ const app = new Hono()
       [Query.orderDesc("$createdAt"), Query.contains("$id", workspaceIds)]
     );
 
-    return c.json({ data: workspaces });
+    // Fetch all members for each workspace
+    const workspaceMembersMap: { [key: string]: Models.Document[] } = {};
+    for (const workspace of workspaces.documents) {
+      const membersRes = await databases.listDocuments(
+        DATABASE_ID,
+        MEMBERS_ID,
+        [Query.equal("workspace", workspace.$id)]
+      );
+      workspaceMembersMap[workspace.$id] = membersRes.documents;
+    }
+
+    // TODO: Don't append current user to the workspace members. So this is workspaceWithOtherMembers
+    // TODO: Make role passed to the client to be lowercase but the first letter to be uppercase
+    // Attach members to each workspace
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const workspacesWithMembers: ({ [key: string]: any } & {
+      members: Models.Document[];
+      $id: string;
+      $collectionId: string;
+      $databaseId: string;
+      $createdAt: string;
+      $updatedAt: string;
+      $permissions: string[];
+    })[] = workspaces.documents.map((workspace) => ({
+      ...workspace,
+      members: workspaceMembersMap[workspace.$id] || [],
+      role: workspaceMembersMap[workspace.$id].find(
+        (member) => member.profile.$id === profile.documents[0].$id
+      )?.role as MEMBER_ROLE,
+    }));
+
+    return c.json({
+      data: { ...workspaces, documents: workspacesWithMembers },
+    });
   })
   .post(
     "/",
@@ -48,14 +87,17 @@ const app = new Hono()
         ID.unique(),
         {
           name,
-          userId: user.$id,
           inviteCode: generateInviteCode(4),
         }
       );
 
+      const profile = await databases.listDocuments(DATABASE_ID, PROFILES_ID, [
+        Query.equal("userId", user.$id),
+      ]);
+
       await databases.createDocument(DATABASE_ID, MEMBERS_ID, ID.unique(), {
-        userId: user.$id,
-        workspaceId: workspace.$id,
+        profile: profile.documents[0].$id,
+        workspace: workspace.$id,
         role: MEMBER_ROLE.ADMIN,
       });
 

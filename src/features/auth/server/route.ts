@@ -1,8 +1,15 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { deleteCookie, setCookie } from "hono/cookie";
-import { ID } from "node-appwrite";
+import { Client, Databases, ID } from "node-appwrite";
 
+import {
+  APPWRITE_ENDPOINT,
+  APPWRITE_KEY,
+  APPWRITE_PROJECT_ID,
+  DATABASE_ID,
+  PROFILES_ID,
+} from "@/config";
 import { signInSchema, signUpSchema } from "@/features/auth/schemas";
 import { createAdminClient } from "@/lib/server/appwrite";
 import { sessionMiddleware } from "@/lib/server/middlewares/session-middleware";
@@ -35,14 +42,26 @@ const app = new Hono()
     const { email, password, firstName, lastName } = c.req.valid("json");
 
     const { account } = await createAdminClient();
-
-    await account.create(
+    const user = await account.create(
       ID.unique(),
       email,
       password,
       `${firstName} ${lastName}`
     );
     const session = await account.createEmailPasswordSession(email, password);
+
+    // Create profile document
+    const client = new Client()
+      .setEndpoint(APPWRITE_ENDPOINT)
+      .setProject(APPWRITE_PROJECT_ID)
+      .setKey(APPWRITE_KEY);
+    const databases = new Databases(client);
+    await databases.createDocument(DATABASE_ID, PROFILES_ID, ID.unique(), {
+      userId: user.$id,
+      firstName,
+      lastName,
+      email,
+    });
 
     setCookie(c, AUTH_COOKIE, session.secret, {
       path: "/",
