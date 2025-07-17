@@ -10,6 +10,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import ProfileMenuButton from "@/features/auth/components/profile-menu-button";
 
 interface Props {
   children: React.ReactNode;
@@ -31,6 +32,9 @@ export default function DashboardLayout({ children }: Props) {
               <BreadcrumbItem>Home</BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
+          <div className="ml-auto">
+            <ProfileMenuButton />
+          </div>
         </header>
         <main className="p-4">{children}</main>
       </SidebarInset>

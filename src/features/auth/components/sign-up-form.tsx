@@ -1,14 +1,11 @@
 "use client";
 
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { signUpSchema } from "@/features/auth/schemas";
-import useSignUp from "@/features/auth/api/use-sign-up";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -26,6 +23,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import useSignUp from "@/features/auth/api/use-sign-up";
+import { signUpSchema } from "@/features/auth/schemas";
+import { cn } from "@/lib/utils";
 
 export default function SignUpForm({
   className,

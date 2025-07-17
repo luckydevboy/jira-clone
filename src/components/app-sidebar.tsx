@@ -1,5 +1,13 @@
+"use client";
+
+import {
+  CircleCheck,
+  GalleryVerticalEnd,
+  Home,
+  Settings,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
-import { CircleCheck, Home, Settings, Users } from "lucide-react";
 
 import {
   Sidebar,
@@ -12,6 +20,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import WorkspaceSwitcher from "@/features/workspaces/components/workspace-switcher";
 
 const items = [
   {
@@ -25,25 +34,31 @@ const items = [
     icon: CircleCheck,
   },
   {
-    title: "Settings",
-    url: "",
-    icon: Settings,
+    title: "Workspaces",
+    url: "/workspaces",
+    icon: GalleryVerticalEnd,
   },
   {
     title: "Members",
     url: "",
     icon: Users,
   },
+  {
+    title: "Settings",
+    url: "",
+    icon: Settings,
+  },
 ];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar {...props}>
-      <SidebarHeader></SidebarHeader>
+      <SidebarHeader>
+        <WorkspaceSwitcher />
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
-            {" "}
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
