@@ -5,6 +5,35 @@ import React from "react";
 
 import { cn } from "@/lib/utils";
 
+interface AnimationProps {
+  initial: {
+    "--x": string;
+    scale: number;
+  };
+  animate: {
+    "--x": string;
+    scale: number;
+  };
+  whileTap: {
+    scale: number;
+  };
+  transition: {
+    repeat: number;
+    repeatType: "loop";
+    repeatDelay: number;
+    type: "spring";
+    stiffness: number;
+    damping: number;
+    mass: number;
+    scale: {
+      type: "spring";
+      stiffness: number;
+      damping: number;
+      mass: number;
+    };
+  };
+}
+
 const animationProps = {
   initial: { "--x": "100%", scale: 0.8 },
   animate: { "--x": "-100%", scale: 1 },
@@ -24,7 +53,7 @@ const animationProps = {
       mass: 0.5,
     },
   },
-};
+} as AnimationProps;
 
 interface ShinyButtonProps
   extends Omit<React.HTMLAttributes<HTMLElement>, keyof MotionProps>,
