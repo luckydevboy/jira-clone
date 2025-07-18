@@ -110,9 +110,13 @@ const app = new Hono()
 
     const { workspaceId } = c.req.param();
 
-    const members = await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
+    const profile = await databases.listDocuments(DATABASE_ID, PROFILES_ID, [
       Query.equal("userId", user.$id),
-      Query.equal("workspaceId", workspaceId),
+    ]);
+
+    const members = await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
+      Query.equal("profile", profile.documents[0].$id),
+      Query.equal("workspace", workspaceId),
     ]);
     const member = members.documents[0];
 
@@ -135,9 +139,13 @@ const app = new Hono()
       const { workspaceId } = c.req.param();
       const { name } = c.req.valid("form");
 
-      const members = await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
+      const profile = await databases.listDocuments(DATABASE_ID, PROFILES_ID, [
         Query.equal("userId", user.$id),
-        Query.equal("workspaceId", workspaceId),
+      ]);
+
+      const members = await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
+        Query.equal("profile", profile.documents[0].$id),
+        Query.equal("workspace", workspaceId),
       ]);
       const member = members.documents[0];
 

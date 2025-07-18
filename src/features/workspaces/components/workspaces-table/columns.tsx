@@ -2,6 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowLeftRight, MoreHorizontal, Pencil, Trash } from "lucide-react";
+import { useState } from "react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,10 @@ import {
 } from "@/components/ui/tooltip";
 import { MEMBER_ROLE } from "@/features/members/types";
 
+import DeleteWorkspaceModal from "../delete-workspace-modal";
+import SwitchWorkspaceModal from "../switch-workspace-modal";
+import UpdateWorkspaceModal from "../update-workspace-modal";
+
 export type Workspace = {
   id: string;
   name: string;
@@ -35,6 +40,62 @@ export type Workspace = {
   }[];
   role: MEMBER_ROLE;
 };
+
+function Actions({ data }: { data: Workspace }) {
+  const { id: workspaceId, name, role } = data;
+
+  const [openDialog, setOpenDialog] = useState<
+    "switch" | "edit" | "delete" | null
+  >(null);
+
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuItem onClick={() => setOpenDialog("switch")}>
+            <ArrowLeftRight />
+            Switch
+          </DropdownMenuItem>
+          {role === MEMBER_ROLE.ADMIN && (
+            <DropdownMenuItem onClick={() => setOpenDialog("edit")}>
+              <Pencil />
+              Edit
+            </DropdownMenuItem>
+          )}
+          {role === MEMBER_ROLE.ADMIN && (
+            <DropdownMenuItem onClick={() => setOpenDialog("delete")}>
+              <Trash />
+              Delete
+            </DropdownMenuItem>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <DeleteWorkspaceModal
+        isOpen={openDialog === "delete"}
+        onOpenChange={(open) => !open && setOpenDialog(null)}
+        data={{ name, workspaceId }}
+      />
+      <UpdateWorkspaceModal
+        isOpen={openDialog === "edit"}
+        onOpenChange={(open) => !open && setOpenDialog(null)}
+        data={{ name, workspaceId }}
+      />
+      <SwitchWorkspaceModal
+        isOpen={openDialog === "switch"}
+        onOpenChange={(open) => !open && setOpenDialog(null)}
+        data={{ name, workspaceId }}
+      />
+    </>
+  );
+}
 
 export const columns: ColumnDef<Workspace>[] = [
   {
@@ -97,34 +158,6 @@ export const columns: ColumnDef<Workspace>[] = [
   },
   {
     id: "actions",
-    cell: () => {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>
-              <ArrowLeftRight />
-              Switch
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Pencil />
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Trash />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    cell: ({ row }) => <Actions data={row.original} />,
   },
 ];
-
-// TODO: handle delete edit, and switch workspaces

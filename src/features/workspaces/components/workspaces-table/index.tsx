@@ -6,9 +6,10 @@ import CreateWorkspaceModal from "../create-workspace-modal";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
 
-export default function WorkspacesDataTable() {
+export default function WorkspacesTable() {
   const { data, isLoading } = useGetWorkspaces();
 
+  // TODO: use skeleton loader
   if (isLoading) {
     return <div>Loading...</div>;
   }

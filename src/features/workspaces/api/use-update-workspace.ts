@@ -4,6 +4,8 @@ import { toast } from "sonner";
 
 import { client } from "@/lib/server/rpc";
 
+import { WORKSPACES_QUERY_KEYS } from "./query-keys";
+
 type ResponseType = InferResponseType<
   (typeof client.api.v1.workspaces)[":workspaceId"]["$patch"],
   200
@@ -33,8 +35,12 @@ export const useUpdateWorkspace = () => {
     onSuccess: ({ data }) => {
       toast.success("Workspace updated");
 
-      queryClient.invalidateQueries({ queryKey: ["workspaces"] });
-      queryClient.invalidateQueries({ queryKey: ["workspace", data.$id] });
+      queryClient.invalidateQueries({
+        queryKey: [WORKSPACES_QUERY_KEYS.WORKSPACES],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [WORKSPACES_QUERY_KEYS.WORKSPACE, data.$id],
+      });
     },
     onError: () => {
       toast.error("Failed to create workspace");
