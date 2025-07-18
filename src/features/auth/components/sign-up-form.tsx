@@ -49,7 +49,7 @@ export default function SignUpForm({
       { json: values },
       {
         onSuccess: () => {
-          router.push("/");
+          router.push("/dashboard");
         },
       }
     );

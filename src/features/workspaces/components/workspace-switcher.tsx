@@ -92,7 +92,7 @@ export default function WorkspaceSwitcher() {
       {
         onSuccess: ({ data }) => {
           form.reset();
-          router.push(`/workspaces/${data.$id}`);
+          router.push(`/dashboard/workspaces/${data.$id}`);
         },
       }
     );
@@ -100,7 +100,7 @@ export default function WorkspaceSwitcher() {
 
   function handleClickDropDownMenuItem(workspace: Workspace) {
     setSelectedWorkspace(workspace);
-    router.push(`/workspaces/${workspace.$id}`);
+    router.push(`/dashboard/workspaces/${workspace.$id}`);
   }
 
   return (

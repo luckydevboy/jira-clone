@@ -41,7 +41,7 @@ export default function ProfileMenuButton() {
 
   function handleSignOut() {
     signOut();
-    router.push("/sign-in");
+    router.push("/auth/sign-in");
   }
 
   return (

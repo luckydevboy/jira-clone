@@ -43,7 +43,7 @@ export default function CreateWorkspaceForm() {
       {
         onSuccess: ({ data }) => {
           form.reset();
-          router.push(`/workspaces/${data.$id}`);
+          router.push(`/dashboard/workspaces/${data.$id}`);
         },
       }
     );

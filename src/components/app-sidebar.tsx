@@ -25,27 +25,27 @@ import WorkspaceSwitcher from "@/features/workspaces/components/workspace-switch
 const items = [
   {
     title: "Home",
-    url: "/",
+    url: "/dashboard",
     icon: Home,
   },
   {
     title: "My Tasks",
-    url: "",
+    url: "#",
     icon: CircleCheck,
   },
   {
     title: "Workspaces",
-    url: "/workspaces",
+    url: "/dashboard/workspaces",
     icon: GalleryVerticalEnd,
   },
   {
     title: "Members",
-    url: "",
+    url: "#",
     icon: Users,
   },
   {
     title: "Settings",
-    url: "",
+    url: "#",
     icon: Settings,
   },
 ];

@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useMedia } from "react-use";
 import z from "zod";
@@ -63,7 +64,10 @@ export default function CreateWorkspaceModal() {
     <ResponsiveModal>
       <ResponsiveModalTrigger asChild>
         <div className="flex justify-end mb-4">
-          <Button>Create workspace</Button>
+          <Button variant="secondary" size="sm">
+            <Plus />
+            Create workspace
+          </Button>
         </div>
       </ResponsiveModalTrigger>
       <ResponsiveModalContent>

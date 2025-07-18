@@ -46,7 +46,7 @@ export default function SignInForm({
       { json: values },
       {
         onSuccess: () => {
-          router.push("/");
+          router.push("/dashboard");
         },
       }
     );

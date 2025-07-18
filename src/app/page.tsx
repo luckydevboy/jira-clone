@@ -6,12 +6,9 @@ import { ShimmerButton } from "@/components/magicui/shimmer-button";
 import { ShineBorder } from "@/components/magicui/shine-border";
 import { ShinyButton } from "@/components/magicui/shiny-button";
 import { TextAnimate } from "@/components/magicui/text-animate";
-import { getCurrent } from "@/features/auth/queries";
 import { cn } from "@/lib/utils";
 
-export default async function Home() {
-  const user = await getCurrent();
-
+export default function LandingPage() {
   return (
     <>
       <DotPattern
@@ -25,8 +22,8 @@ export default async function Home() {
       <header className="fixed left-0 top-0 z-50 border-b w-full backdrop-blur-md px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <span className="text-3xl font-black tracking-tight">JiraClone</span>
-          <Link href={user ? "/dashboard" : "/sign-up"}>
-            <ShinyButton>{user ? "Dashboard" : "Sign Up"}</ShinyButton>
+          <Link href="/auth/sign-up">
+            <ShinyButton>Sign Up</ShinyButton>
           </Link>
         </div>
       </header>
@@ -45,7 +42,7 @@ export default async function Home() {
           project tracking, and team collaboration. Built for productivity,
           designed for everyone.
         </TextAnimate>
-        <Link href={user ? "/dashboard" : "/sign-up"}>
+        <Link href="/auth/sign-up">
           <ShimmerButton className="w-48 h-12 shadow-2xl mt-8 mb-16">
             <span className="whitespace-pre-wrap text-center font-medium text-sm leading-none tracking-tight text-white dark:from-white dark:to-slate-900/10 lg:text-lg">
               Get Started
